@@ -31,24 +31,27 @@ def unzip_to_gdf(uploaded_file):
         return None
     return gpd.read_file(shp_file[0])
 
-# Read shapefiles
-poly_gdf = unzip_to_gdf(polygon_file)
-point_gdf = unzip_to_gdf(point_file)
+# Add a Ready button
+if st.button("Ready - Process and Show Map"):
+    poly_gdf = unzip_to_gdf(polygon_file)
+    point_gdf = unzip_to_gdf(point_file)
 
-if poly_gdf is not None or point_gdf is not None:
-    st.subheader("Processed Map")
-    m = leafmap.Map(center=[46.8, -71.2], zoom=10)
+    if poly_gdf is None and point_gdf is None:
+        st.error("Please upload at least one shapefile before clicking Ready.")
+    else:
+        st.subheader("Processed Map")
+        m = leafmap.Map(center=[46.8, -71.2], zoom=10)
 
-    if poly_gdf is not None:
-        # Example custom processing: add polygon area
-        if poly_gdf.geom_type.iloc[0] in ["Polygon", "MultiPolygon"]:
-            poly_gdf["area"] = poly_gdf.area
-        m.add_gdf(poly_gdf, layer_name="Polygons")
+        if poly_gdf is not None:
+            # Example custom processing: add polygon area
+            if poly_gdf.geom_type.iloc[0] in ["Polygon", "MultiPolygon"]:
+                poly_gdf["area"] = poly_gdf.area
+            m.add_gdf(poly_gdf, layer_name="Polygons")
 
-    if point_gdf is not None:
-        # Example custom processing: add lat/lon columns
-        point_gdf["lon"] = point_gdf.geometry.x
-        point_gdf["lat"] = point_gdf.geometry.y
-        m.add_gdf(point_gdf, layer_name="Points", zoom_to_layer=True)
+        if point_gdf is not None:
+            # Example custom processing: add lat/lon columns
+            point_gdf["lon"] = point_gdf.geometry.x
+            point_gdf["lat"] = point_gdf.geometry.y
+            m.add_gdf(point_gdf, layer_name="Points", zoom_to_layer=True)
 
-    m.to_streamlit(height=600)
+        m.to_streamlit(height=600)
