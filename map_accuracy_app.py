@@ -31,6 +31,12 @@ def unzip_to_gdf(uploaded_file):
         return None
     return gpd.read_file(shp_file[0])
 
+def make_json_serializable(gdf):
+    for col in gdf.columns:
+        if gdf[col].dtype.kind == "M":  # "M" stands for datetime64[ns]
+            gdf[col] = gdf[col].astype(str)
+    return gdf
+
 # Add a Ready button
 if st.button("Ready - Process and Show Map"):
     poly_gdf = unzip_to_gdf(polygon_file)
@@ -46,12 +52,14 @@ if st.button("Ready - Process and Show Map"):
             # Example custom processing: add polygon area
             if poly_gdf.geom_type.iloc[0] in ["Polygon", "MultiPolygon"]:
                 poly_gdf["area"] = poly_gdf.area
+            poly_gdf = make_json_serializable(poly_gdf)
             m.add_gdf(poly_gdf, layer_name="Polygons")
-
+        
         if point_gdf is not None:
             # Example custom processing: add lat/lon columns
             point_gdf["lon"] = point_gdf.geometry.x
             point_gdf["lat"] = point_gdf.geometry.y
+            point_gdf = make_json_serializable(point_gdf)
             m.add_gdf(point_gdf, layer_name="Points", zoom_to_layer=True)
 
         m.to_streamlit(height=600)
