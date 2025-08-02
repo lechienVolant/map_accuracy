@@ -57,10 +57,10 @@ if polygon_file and point_file and st.button("Process and Show Map"):
             "ScatterplotLayer",
             data=point_gdf,
             get_position='[lon, lat]',
-            get_radius=100,
-            get_fill_color=[255, 0, 0, 140],
+            get_radius=20,                    # smaller dot radius
+            get_fill_color=[255, 0, 0, 200], # slightly more opaque red
             pickable=True,
-            auto_highlight=True,
+            auto_highlight=False,             # disable glow/shadow on hover
         )
 
         # Center view roughly on polygon centroid or average point location
@@ -73,3 +73,4 @@ if polygon_file and point_file and st.button("Process and Show Map"):
                      tooltip={"html": "Polygon or Point data", "style": {"color": "white"}})
 
         st.pydeck_chart(r)
+
