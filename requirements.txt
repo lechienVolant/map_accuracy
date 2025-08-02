@@ -1,0 +1,7 @@
+streamlit
+geopandas
+leafmap
+shapely
+pyproj
+fiona
+rtree
